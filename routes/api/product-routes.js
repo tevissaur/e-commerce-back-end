@@ -29,11 +29,13 @@ router.get('/:id', async (req, res) => {
 
     if (!oneProduct) {
       res.status(404).json({ message: 'No product with this ID.' })
+    } else {
+      res.status(200).json(oneProduct)
+
     }
-    res.status(200).json(oneProduct)
   }
   catch (error) {
-    res.status(500).json(err)
+    res.status(500).json(error)
   }
 });
 
@@ -64,9 +66,9 @@ router.post('/', (req, res) => {
       res.status(200).json(product);
     })
     .then((productTagIds) => res.status(200).json(productTagIds))
-    .catch((err) => {
-      console.log(err);
-      res.status(400).json(err);
+    .catch((error) => {
+      console.log(error);
+      res.status(400).json(error);
     });
 });
 
@@ -116,13 +118,12 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', async (req, res) => {
   // delete one product by its `id` value
   try {
-    Product.destroy({
+    const deletedProduct = await Product.destroy({
       where: {
         id: req.params.id
       }
     })
-    const deletedProduct = await Product.findByPk(req.params.id)
-    res.status(200).json({ message: `You have deleted the product ${deletedProduct.product_name}` })
+    res.status(200).json({ message: `You have deleted the product with the id of ${deletedProduct}` })
   }
   catch (err) {
     res.status(500).json(err)
