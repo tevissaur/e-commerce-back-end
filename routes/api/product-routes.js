@@ -26,7 +26,7 @@ router.get('/:id', async (req, res) => {
     const oneProduct = await Product.findByPk(req.params.id, {
       include: [{ model: Tag }, { model: Category }]
     })
-    
+
     if (!oneProduct) {
       res.status(404).json({ message: 'No product with this ID.' })
     }
@@ -80,11 +80,14 @@ router.put('/:id', (req, res) => {
   })
     .then((product) => {
       // find all associated tags from ProductTag
+      // console.log(product)
       return ProductTag.findAll({ where: { product_id: req.params.id } });
     })
     .then((productTags) => {
       // get list of current tag_ids
+      // console.log(productTags)
       const productTagIds = productTags.map(({ tag_id }) => tag_id);
+      // console.log(productTagIds)
       // create filtered list of new tag_ids
       const newProductTags = req.body.tagIds
         .filter((tag_id) => !productTagIds.includes(tag_id))
@@ -94,6 +97,7 @@ router.put('/:id', (req, res) => {
             tag_id,
           };
         });
+      console.log(newProductTags)
       // figure out which ones to remove
       const productTagsToRemove = productTags
         .filter(({ tag_id }) => !req.body.tagIds.includes(tag_id))
@@ -112,8 +116,20 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   // delete one product by its `id` value
+  try {
+    Product.destroy({
+      where: {
+        id: req.params.id
+      }
+    })
+    const deletedProduct = await Product.findByPk(req.params.id)
+    res.status(200).json({ message: `You have deleted the product ${deletedProduct.product_name}` })
+  }
+  catch (err) {
+    res.status(500).json(err)
+  }
 });
 
 module.exports = router;
