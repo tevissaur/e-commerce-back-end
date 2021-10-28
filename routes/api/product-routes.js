@@ -17,7 +17,9 @@ router.get('/', async (req, res) => {
     res.status(500).json(error)
   }
 });
-
+router.get('/:id/test', (req, res) => {
+  res.json(req.params.id)
+})
 // get one product
 router.get('/:id', async (req, res) => {
   // find a single product by its `id`
@@ -54,10 +56,10 @@ router.post('/', (req, res) => {
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
       if (req.body.tagIds.length) {
-        const productTagIdArr = req.body.tagIds.map((tag_id) => {
+        const productTagIdArr = req.body.tagIds.map((tagId) => {
           return {
-            product_id: product.id,
-            tag_id,
+            productId: product.id,
+            tagId,
           };
         });
         return ProductTag.bulkCreate(productTagIdArr);
